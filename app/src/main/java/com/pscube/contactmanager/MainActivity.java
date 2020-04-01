@@ -1,6 +1,8 @@
 package com.pscube.contactmanager;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -11,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.pscube.contactmanager.adapters.adapter;
 import com.pscube.contactmanager.data.database;
 import com.pscube.contactmanager.models.Contacts;
 import com.pscube.contactmanager.util.utils;
@@ -19,8 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    ListView listView;
-    ArrayList<String> contactsArrayList ;
+
+
+    RecyclerView recyclerView;
+    adapter adapter;
+    ArrayList<Contacts> contactsArrayList ;
     ArrayAdapter<String> arrayAdapter ;
     Contacts contacts;
 
@@ -30,14 +36,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listView = findViewById(R.id.listView);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         contactsArrayList = new ArrayList<>();
-
-
-
-
         final database database= new database(this);
-        Log.d("count", "onCreate: "+database.getCount());
+
+
+        List<Contacts> contactsList = database.getContactsList();
+
+        for (Contacts contacts : contactsList){
+
+
+            Log.d("TAG", "onCreate: "+contacts.getName());
+
+            contactsArrayList.add(contacts);
+
+        }
+
+        adapter= new adapter(this,contactsArrayList);
+
+         recyclerView.setAdapter(adapter);
 
 
 //        Contacts prateek= new Contacts();
@@ -77,30 +98,10 @@ public class MainActivity extends AppCompatActivity {
 
         //to get all contacts
 
-            List<Contacts> contactsList = database.getContactsList();
-
-            for (Contacts contacts : contactsList){
 
 
-                Log.d("TAG", "onCreate: "+contacts.getName());
-
-                contactsArrayList.add(contacts.getName());
-
-            }
-
-        arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1,
-                contactsArrayList);
 
 
-            listView.setAdapter(arrayAdapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Toast.makeText(MainActivity.this, ""+contactsArrayList.get(position), Toast.LENGTH_SHORT).show();
-                }
-            });
     }
 
 
